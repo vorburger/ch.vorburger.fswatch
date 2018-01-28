@@ -38,7 +38,7 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
     }
 
     @Override public FileWatcherBuilder path(Path fileNotDirectory) {
-        return (FileWatcherBuilder) super.path(fileNotDirectory);
+        return (FileWatcherBuilder) super.path(fileNotDirectory.toAbsolutePath());
     }
 
     @Override

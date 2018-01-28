@@ -32,6 +32,7 @@ import ch.vorburger.fswatch.FileWatcherBuilder;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import java.io.File;
+import java.nio.file.FileSystems;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -177,6 +178,16 @@ public class DirectoryAndFileWatcherTest {
     @Test
     public void testDirectoryWatcherRelativeFileNPE() throws Throwable {
         new DirectoryWatcherBuilder().path(new File(".")).listener((path, changeKind) -> {}).build().close();
+    }
+
+    @Test
+    public void testFileWatcherRelativePathNPE() throws Throwable {
+        new FileWatcherBuilder().path(FileSystems.getDefault().getPath("LICENSE")).listener((path, changeKind) -> {}).build().close();
+    }
+
+    @Test
+    public void testDirectoryWatcherRelativePathNPE() throws Throwable {
+        new DirectoryWatcherBuilder().path(FileSystems.getDefault().getPath(".")).listener((path, changeKind) -> {}).build().close();
     }
 
 }
