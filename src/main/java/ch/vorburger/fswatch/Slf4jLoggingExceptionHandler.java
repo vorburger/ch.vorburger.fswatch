@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An ExceptionHandler which logs to slfj4j.
+ * ExceptionHandler which logs to slfj4j.
  *
  * @author Michael Vorburger.ch
  */

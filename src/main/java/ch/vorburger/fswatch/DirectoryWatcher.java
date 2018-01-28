@@ -23,7 +23,7 @@ import java.io.Closeable;
 import java.nio.file.Path;
 
 /**
- * Watch a directory and be notified on your Listener on changes in it.
+ * Watch a directory and be notified on your Listener for changes in it.
  *
  * @author Michael Vorburger.ch
  */
@@ -33,9 +33,12 @@ public interface DirectoryWatcher extends Closeable {
         MODIFIED, DELETED
     }
 
+    /**
+     * Listener for change notifications.
+     */
     interface Listener {
         /**
-         * Listener for file change notifications.
+         * Called back method.
          * @param path Path to what caused the change. Note that when watching directory trees, we get a notification of one file (or new/deleted directory) causing it, not the registered root directory.
          * @param changeKind whether the change was a modification or a deletion
          * @throws Throwable if anything went wrong
@@ -43,6 +46,9 @@ public interface DirectoryWatcher extends Closeable {
         void onChange(Path path, ChangeKind changeKind) throws Throwable;
     }
 
+    /**
+     * Handles exceptions which occur during {@link Listener#onChange(Path, ChangeKind)}.
+     */
     interface ExceptionHandler {
         void onException(Throwable t);
     }

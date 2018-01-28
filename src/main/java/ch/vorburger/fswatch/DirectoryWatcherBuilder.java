@@ -28,7 +28,7 @@ import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
 import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 
 /**
- * Builder for DirectoryWatcher.
+ * Builder for {@link DirectoryWatcher}.
  *
  * @author Michael Vorburger.ch
  */
