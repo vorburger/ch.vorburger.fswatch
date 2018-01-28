@@ -7,6 +7,7 @@
   <groupId>ch.vorburger</groupId>
   <artifactId>fswatch</artifactId>
   <version>1.0.0</version>
+  <packaging>bundle</packaging>
 
   <name>ch.vorburger:fswatch</name>
   <description>Java lib for monitoring directories or individual files based on the `java.nio.file.WatchService`.</description>
@@ -67,7 +68,7 @@
   </licenses>
 
   <organization>
-    <name>Michael Vorburger</name>
+    <name>Michael Vorburger.ch</name>
     <url>http://www.vorburger.ch</url>
   </organization>
 
@@ -82,6 +83,13 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>3.5.0</version>
+        <extensions>true</extensions>
+      </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -98,7 +106,7 @@
         <artifactId>maven-source-plugin</artifactId>
         <version>3.0.1</version>
         <configuration>
-                  <!-- This is super important (to avoid the binaries in the *-sources.jar) -->
+          <!-- This is super important (to avoid the binaries in the *-sources.jar) -->
           <excludeResources>true</excludeResources>
           <includePom>true</includePom>
         </configuration>
