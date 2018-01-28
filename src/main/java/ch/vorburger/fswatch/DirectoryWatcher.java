@@ -47,7 +47,7 @@ public interface DirectoryWatcher extends Closeable {
     }
 
     /**
-     * Handles exceptions which occur during {@link Listener#onChange(Path, ChangeKind)}.
+     * Handles exceptions which occur during Listener onChange().
      */
     interface ExceptionHandler {
         void onException(Throwable t);

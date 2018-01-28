@@ -25,6 +25,8 @@ import java.io.IOException;
 /**
  * main() for DirectoryWatcher.
  *
+ * See also src/test/java/ch/vorburger/fswatch/test/ExampleMain.java.
+ *
  * @author Michael Vorburger.ch
  */
 public class DirectoryWatcherMain {

@@ -28,6 +28,8 @@ import java.io.IOException;
 /**
  * Example illustrating fswatch usage.
  *
+ * See also src/main/java/ch/vorburger/fswatch/DirectoryWatcherMain.java
+ *
  * @author Michael Vorburger.ch
  */
 public class ExampleMain {
