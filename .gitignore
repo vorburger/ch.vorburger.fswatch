@@ -1,0 +1,13 @@
+.settings/
+.project
+.classpath
+
+bin/
+.apt_generated/
+xtend-gen/
+
+.gradle/
+build/
+.gradletasknamecache
+
+target/
