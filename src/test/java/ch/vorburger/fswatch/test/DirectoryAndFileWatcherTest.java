@@ -169,4 +169,14 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
+    @Test
+    public void testFileWatcherRelativeFileNPE() throws Throwable {
+        new FileWatcherBuilder().path(new File("LICENSE")).listener((path, changeKind) -> {}).build().close();
+    }
+
+    @Test
+    public void testDirectoryWatcherRelativeFileNPE() throws Throwable {
+        new DirectoryWatcherBuilder().path(new File(".")).listener((path, changeKind) -> {}).build().close();
+    }
+
 }

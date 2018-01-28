@@ -34,7 +34,7 @@ import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 public class FileWatcherBuilder extends DirectoryWatcherBuilder {
 
     @Override public FileWatcherBuilder path(File fileNotDirectory) {
-        return (FileWatcherBuilder) super.path(fileNotDirectory);
+        return (FileWatcherBuilder) super.path(fileNotDirectory.getAbsoluteFile());
     }
 
     @Override public FileWatcherBuilder path(Path fileNotDirectory) {
@@ -54,7 +54,9 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
         return watcher;
     }
 
-
+    /**
+     * Protected inner {@link Listener} class.
+     */
     protected static class FileWatcherListener implements Listener {
 
         private final Listener delegate;
