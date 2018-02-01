@@ -2,6 +2,10 @@
 
 Java lib for monitoring directories or individual files based on the `java.nio.file.WatchService`.
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.vorburger/fswatch/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.vorburger/fswatch)
+[![Javadocs](http://www.javadoc.io/badge/ch.vorburger/fswatch.svg)](http://www.javadoc.io/doc/ch.vorburger/fswatch)
+
+
 ## Usage
 
 [Get it from Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22ch.vorburger%22%20AND%20a%3A%22fswatch%22) and see [the ExampleMain class](src/test/java/ch/vorburger/fswatch/test/ExampleMain.java) for how to use this library.
