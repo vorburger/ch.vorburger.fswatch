@@ -23,6 +23,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -52,13 +53,13 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
     protected final WatchService watcher = FileSystems.getDefault().newWatchService(); // better final, as it will be accessed by both threads (normally OK either way, but still)
     protected final Thread thread;
 
-    // protected because typical code should use the DirectoryWatcherBuilder instead of thisi directly
-    protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, ExceptionHandler exceptionHandler) throws IOException {
+    // protected because typical code should use the DirectoryWatcherBuilder instead of this directly
+    protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler) throws IOException {
         if (!watchBasePath.toFile().isDirectory()) {
             throw new IllegalArgumentException("Not a directory: " + watchBasePath.toString());
         }
 
-        register(watchSubDirectories, watchBasePath);
+        register(watchSubDirectories, watchBasePath, fileFilter);
         Runnable r = () -> {
             for (;;) {
                 WatchKey key;
@@ -93,7 +94,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
                     if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
                         if (Files.isDirectory(absolutePath)) { // don't NOFOLLOW_LINKS
                             try {
-                                register(watchSubDirectories, watchBasePath);
+                                register(watchSubDirectories, watchBasePath, fileFilter);
                             } catch (IOException e) {
                                 exceptionHandler.onException(e);
                             }
@@ -126,9 +127,9 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
         thread.start();
     }
 
-    protected void register(boolean watchSubDirectories, final Path path) throws IOException {
+    protected void register(boolean watchSubDirectories, final Path path, FileFilter fileFilter) throws IOException {
         if (watchSubDirectories) {
-            registerAll(path);
+            registerAll(path, fileFilter);
         } else {
             registerOne(path);
         }
@@ -143,13 +144,15 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
 
     // Implementation inspired by https://docs.oracle.com/javase/tutorial/essential/io/examples/WatchDir.java, from https://docs.oracle.com/javase/tutorial/essential/io/notification.html
 
-    protected void registerAll(final Path basePath) throws IOException {
+    protected void registerAll(final Path basePath, FileFilter fileFilter) throws IOException {
         // register basePath directory and sub-directories
         Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
             {
-                registerOne(dir);
+                if (fileFilter == null || !fileFilter.accept(dir.toFile())) {
+                    registerOne(dir);
+                }
                 return FileVisitResult.CONTINUE;
             }
         });

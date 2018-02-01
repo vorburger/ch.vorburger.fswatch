@@ -20,6 +20,7 @@
 package ch.vorburger.fswatch;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -39,6 +40,7 @@ public class DirectoryWatcherBuilder {
     protected Listener listener;
     protected ExceptionHandler exceptionHandler = new Slf4jLoggingExceptionHandler();
     protected long quietPeriodInMS = 100;
+    protected FileFilter fileFilter;
 
     public DirectoryWatcherBuilder path(File directory) {
         return path(directory.toPath());
@@ -70,12 +72,22 @@ public class DirectoryWatcherBuilder {
         return this;
     }
 
+    /**
+     * Filter out directories you don't want to be watched.
+     * @param fileFilter match files that don't need to be watched
+     * @return this
+     */
+    public DirectoryWatcherBuilder fileFilter(FileFilter fileFilter) {
+        this.fileFilter = fileFilter;
+        return this;
+    }
+
     public DirectoryWatcher build() throws IOException {
         check();
         if (!path.toFile().isDirectory()) {
             throw new IllegalStateException("When using DirectoryWatcherBuilder, set path() to a directory, not a file (use FileWatcherBuilder to watch a single file)");
         }
-        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(true, path, getQuietListener(listener), exceptionHandler);
+        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(true, path, getQuietListener(listener), fileFilter, exceptionHandler);
         firstListenerNotification();
         return watcher;
     }
