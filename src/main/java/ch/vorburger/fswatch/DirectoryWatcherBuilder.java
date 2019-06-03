@@ -41,6 +41,7 @@ public class DirectoryWatcherBuilder {
     protected ExceptionHandler exceptionHandler = new Slf4jLoggingExceptionHandler();
     protected long quietPeriodInMS = 100;
     protected FileFilter fileFilter;
+    protected ChangeKind[] eventKinds = new ChangeKind[] {ChangeKind.CREATED,ChangeKind.MODIFIED};
 
     public DirectoryWatcherBuilder path(File directory) {
         return path(directory.toPath());
@@ -60,6 +61,10 @@ public class DirectoryWatcherBuilder {
         }
         this.listener = listener;
         return this;
+    }
+    public DirectoryWatcherBuilder eventKinds(ChangeKind... eventKinds) {
+    	this.eventKinds = eventKinds;
+    	return this;
     }
 
     public DirectoryWatcherBuilder exceptionHandler(ExceptionHandler exceptionHandler) {
@@ -87,7 +92,7 @@ public class DirectoryWatcherBuilder {
         if (!path.toFile().isDirectory()) {
             throw new IllegalStateException("When using DirectoryWatcherBuilder, set path() to a directory, not a file (use FileWatcherBuilder to watch a single file)");
         }
-        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(true, path, getQuietListener(listener), fileFilter, exceptionHandler);
+        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(true, path, getQuietListener(listener), fileFilter, exceptionHandler,eventKinds);
         firstListenerNotification();
         return watcher;
     }

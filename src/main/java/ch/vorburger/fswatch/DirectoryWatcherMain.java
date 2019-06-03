@@ -21,6 +21,9 @@ package ch.vorburger.fswatch;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.WatchEvent.Kind;
+
+import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 
 /**
  * main() for DirectoryWatcher.
@@ -40,7 +43,9 @@ public class DirectoryWatcherMain {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
 
         File dir = new File(args[0]);
-        DirectoryWatcherImpl dw = (DirectoryWatcherImpl) new DirectoryWatcherBuilder().path(dir)
+        DirectoryWatcherImpl dw = (DirectoryWatcherImpl) new DirectoryWatcherBuilder()
+        		.path(dir)
+        		.eventKinds(new ChangeKind[] {ChangeKind.CREATED,ChangeKind.MODIFIED,ChangeKind.DELETED})
                 // Using explicit anonymous inner classes instead of Lambdas for clarity to readers
                 .listener((path, changeKind) -> System.out.println(changeKind.toString() + " " + path.toString())).exceptionHandler(t -> t.printStackTrace()).build();
 
