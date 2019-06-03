@@ -71,35 +71,35 @@ public class DirectoryAndFileWatcherTest {
 
             // We want it to call the listener once for setup, even without any change
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(5, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             changed = false;
             Files.write("ho", file, Charsets.US_ASCII);
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(30, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             changed = false;
             Files.write("do", file, Charsets.US_ASCII);
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(20, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             changed = false;
             file.delete();
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(5, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             changed = false;
             Files.write("yo", file, Charsets.US_ASCII);
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(5, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             changed = false;
             File anotherFile = new File(dir, "another.txt");
             Files.write("another", anotherFile, Charsets.US_ASCII);
-            await().atMost(1, SECONDS).until(() -> changed, is(false));
+            await().atMost(5, SECONDS).until(() -> changed, is(false));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         }
     }
@@ -123,7 +123,7 @@ public class DirectoryAndFileWatcherTest {
 
             // We want it to call the listener once for setup, even without any change
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(5, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             // Note we're creating another new sub-directory (because we want to
@@ -137,17 +137,17 @@ public class DirectoryAndFileWatcherTest {
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
             await().
                 // conditionEvaluationListener(new ConditionEvaluationLogger()).
-                atMost(1, SECONDS).until(() -> changed, is(true));
+                atMost(30, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             changed = false;
             Files.write("do", newFile, Charsets.US_ASCII);
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(30, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             changed = false;
             newFile.delete();
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(30, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         }
     }
@@ -179,7 +179,7 @@ public class DirectoryAndFileWatcherTest {
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
             Files.write("do", newFile2, Charsets.US_ASCII);
-            await().atMost(1, SECONDS).until(() -> changed, is(true));
+            await().atMost(30, SECONDS).until(() -> changed, is(true));
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         }
     }

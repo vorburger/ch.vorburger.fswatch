@@ -49,7 +49,7 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
         }
         // NOTE We do want to wrap the FileWatcherListener inside the QuietPeriodListener, and not the other way around!
         Listener wrap = getQuietListener(new FileWatcherListener(path, listener));
-        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(false, path.getParent(), wrap, fileFilter, exceptionHandler);
+        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(false, path.getParent(), wrap, fileFilter, exceptionHandler,eventKinds);
         firstListenerNotification();
         return watcher;
     }

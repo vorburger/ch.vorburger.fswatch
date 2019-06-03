@@ -37,6 +37,9 @@ import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,12 +55,27 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
 
     protected final WatchService watcher = FileSystems.getDefault().newWatchService(); // better final, as it will be accessed by both threads (normally OK either way, but still)
     protected final Thread thread;
-
-    // protected because typical code should use the DirectoryWatcherBuilder instead of this directly
+    protected final List<ChangeKind> changeKindsList = new ArrayList<>();
+    
+    /*
+     * Retained the existing constructor and it will retain the old behaviour of responding only to MODIFIED and DELETED ChangeKinds
+     */
     protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler) throws IOException {
+    	this(watchSubDirectories,watchBasePath,listener,fileFilter,exceptionHandler, new ChangeKind[] {ChangeKind.MODIFIED, ChangeKind.DELETED});
+    }
+    
+    	   
+
+    /*protected because typical code should use the DirectoryWatcherBuilder instead of this directly
+    /*
+     * Added ChangeKinds[] as an arguments to enable clients to specify what ChangeKinds that they are interested in. For e.g on mac
+     * I still want to get CREATED events as mac's behaviour seems to be diff from linux.
+     */
+    protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler, ChangeKind[] eventKinds) throws IOException {
         if (!watchBasePath.toFile().isDirectory()) {
             throw new IllegalArgumentException("Not a directory: " + watchBasePath.toString());
         }
+        changeKindsList.addAll(Arrays.asList(eventKinds));
 
         register(watchSubDirectories, watchBasePath, fileFilter);
         Runnable r = () -> {
@@ -101,20 +119,28 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
                         }
                     }
 
-                    if (kind == StandardWatchEventKinds.ENTRY_MODIFY || kind == StandardWatchEventKinds.ENTRY_DELETE) {
-                        // To reduce notifications, only call the Listener on Modify and Delete but not Create,
-                        // because (on Linux at least..) every ENTRY_CREATE from new file
-                        // is followed by an ENTRY_MODIFY anyway.
+                   
                         try {
                             ChangeKind ourKind = kind == StandardWatchEventKinds.ENTRY_MODIFY ? ChangeKind.MODIFIED : ChangeKind.DELETED;
-                            listener.onChange(absolutePath, ourKind);
+                            //Cannot use switch here as "kind" is not one of the supported types for switch.
+                            if (kind ==  StandardWatchEventKinds.ENTRY_CREATE) {
+                            	ourKind = ChangeKind.CREATED;
+                            }else if (kind ==  StandardWatchEventKinds.ENTRY_MODIFY) {
+                            	ourKind = ChangeKind.MODIFIED;
+                            }else {
+                            	ourKind = ChangeKind.DELETED;
+                            }
+                            if (changeKindsList.contains(ourKind)) { //Only send the evnts that the client is interested in
+                               listener.onChange(absolutePath, ourKind);
+                            }
                         } catch (Throwable e) {
                             exceptionHandler.onException(e);
                         }
-                    }
+                    
                 }
                 key.reset();
             }
+            
         };
         String threadName = DirectoryWatcherImpl.class.getSimpleName() + ": " + watchBasePath.toString();
         thread = new Thread(r, threadName);
@@ -126,6 +152,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
         });
         thread.start();
     }
+    
 
     protected void register(boolean watchSubDirectories, final Path path, FileFilter fileFilter) throws IOException {
         if (watchSubDirectories) {
