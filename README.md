@@ -4,7 +4,7 @@ Java lib for monitoring directories or individual files based on the `java.nio.f
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ch.vorburger/fswatch/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ch.vorburger/fswatch)
 [![Javadocs](http://www.javadoc.io/badge/ch.vorburger/fswatch.svg)](http://www.javadoc.io/doc/ch.vorburger/fswatch)
-
+[![Build Status](https://travis-ci.org/vorburger/ch.vorburger.fswatch.svg?branch=master)](https://travis-ci.org/vorburger/ch.vorburger.fswatch)
 
 ## Usage
 
