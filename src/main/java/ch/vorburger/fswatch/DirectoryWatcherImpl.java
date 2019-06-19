@@ -57,20 +57,11 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
     protected final Thread thread;
     protected final List<ChangeKind> changeKindsList = new ArrayList<>();
     
-    /*
-     * Retained the existing constructor and it will retain the old behaviour of responding only to MODIFIED and DELETED ChangeKinds
-     */
     protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler) throws IOException {
     	this(watchSubDirectories,watchBasePath,listener,fileFilter,exceptionHandler, new ChangeKind[] {ChangeKind.MODIFIED, ChangeKind.DELETED});
     }
     
-    	   
-
-    /*protected because typical code should use the DirectoryWatcherBuilder instead of this directly
-    /*
-     * Added ChangeKinds[] as an arguments to enable clients to specify what ChangeKinds that they are interested in. For e.g on mac
-     * I still want to get CREATED events as mac's behaviour seems to be diff from linux.
-     */
+    // protected because typical code should use the DirectoryWatcherBuilder instead of this directly
     protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler, ChangeKind[] eventKinds) throws IOException {
         if (!watchBasePath.toFile().isDirectory()) {
             throw new IllegalArgumentException("Not a directory: " + watchBasePath.toString());
@@ -121,16 +112,15 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
 
                    
                         try {
-                            ChangeKind ourKind = kind == StandardWatchEventKinds.ENTRY_MODIFY ? ChangeKind.MODIFIED : ChangeKind.DELETED;
-                            //Cannot use switch here as "kind" is not one of the supported types for switch.
+                            ChangeKind ourKind = null;
                             if (kind ==  StandardWatchEventKinds.ENTRY_CREATE) {
                             	ourKind = ChangeKind.CREATED;
-                            }else if (kind ==  StandardWatchEventKinds.ENTRY_MODIFY) {
+                            } else if (kind ==  StandardWatchEventKinds.ENTRY_MODIFY) {
                             	ourKind = ChangeKind.MODIFIED;
-                            }else {
+                            } else {
                             	ourKind = ChangeKind.DELETED;
                             }
-                            if (changeKindsList.contains(ourKind)) { //Only send the evnts that the client is interested in
+                            if (changeKindsList.contains(ourKind)) { // Only send the evnts that the client is interested in
                                listener.onChange(absolutePath, ourKind);
                             }
                         } catch (Throwable e) {

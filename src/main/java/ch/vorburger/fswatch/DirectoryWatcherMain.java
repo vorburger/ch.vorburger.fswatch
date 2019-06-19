@@ -45,9 +45,10 @@ public class DirectoryWatcherMain {
         File dir = new File(args[0]);
         DirectoryWatcherImpl dw = (DirectoryWatcherImpl) new DirectoryWatcherBuilder()
         		.path(dir)
-        		.eventKinds(new ChangeKind[] {ChangeKind.CREATED,ChangeKind.MODIFIED,ChangeKind.DELETED})
+        		.eventKinds(new ChangeKind[] { ChangeKind.CREATED, ChangeKind.MODIFIED, ChangeKind.DELETED })
                 // Using explicit anonymous inner classes instead of Lambdas for clarity to readers
-                .listener((path, changeKind) -> System.out.println(changeKind.toString() + " " + path.toString())).exceptionHandler(t -> t.printStackTrace()).build();
+                .listener((path, changeKind) -> System.out.println(changeKind.toString() + " " + path.toString()))
+                .exceptionHandler(t -> t.printStackTrace()).build();
 
         // This is just because it's a main(), you normally would NOT do this:
         dw.thread.join();
