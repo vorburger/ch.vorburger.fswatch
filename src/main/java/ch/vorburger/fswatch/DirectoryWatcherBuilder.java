@@ -41,7 +41,7 @@ public class DirectoryWatcherBuilder {
     protected ExceptionHandler exceptionHandler = new Slf4jLoggingExceptionHandler();
     protected long quietPeriodInMS = 100;
     protected FileFilter fileFilter;
-    protected ChangeKind[] eventKinds = new ChangeKind[] { ChangeKind.CREATED, ChangeKind.MODIFIED };
+    protected ChangeKind[] eventKinds = new ChangeKind[] { ChangeKind.DELETED, ChangeKind.MODIFIED };
 
     public DirectoryWatcherBuilder path(File directory) {
         return path(directory.toPath());
