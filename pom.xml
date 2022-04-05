@@ -10,7 +10,7 @@
 
   <name>ch.vorburger:fswatch</name>
   <description>Java lib for monitoring directories or individual files based on the `java.nio.file.WatchService`.</description>
-  <url>https://github.com/vorburger/MariaDB4j</url>
+  <url>https://github.com/vorburger/ch.vorburger.fswatch</url>
   <inceptionYear>2015</inceptionYear>
 
   <properties>
