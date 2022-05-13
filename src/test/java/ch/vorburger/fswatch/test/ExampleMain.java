@@ -19,12 +19,11 @@
  */
 package ch.vorburger.fswatch.test;
 
-import java.io.File;
-import java.io.IOException;
-
 import ch.vorburger.fswatch.DirectoryWatcher;
 import ch.vorburger.fswatch.DirectoryWatcherBuilder;
 import ch.vorburger.fswatch.FileWatcherBuilder;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Example illustrating fswatch usage.
@@ -37,22 +36,24 @@ public class ExampleMain {
 
     private static void watchDirectoryExample() throws IOException {
         File dir = new File(".");
-        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir)
-                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build()) {
+        DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir)
+                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build();
 
-            System.out.println("Press Enter to stop; now watching for changed in directory: " + dir.getAbsolutePath());
-            System.in.read();
-        }
+        System.out.println("Press Enter to stop; now watching for changed in directory: " + dir.getAbsolutePath());
+        System.in.read();
+
+        dw.close();
     }
 
     private static void watchFileExample() throws IOException {
         File file = new File("pom.xml");
-        try (DirectoryWatcher dw = new FileWatcherBuilder().path(file)
-                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build()) {
+        DirectoryWatcher dw = new FileWatcherBuilder().path(file)
+                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build();
 
-            System.out.println("Press Enter to stop; now watching for changed in file: " + file.getAbsolutePath());
-            System.in.read();
-        }
+        System.out.println("Press Enter to stop; now watching for changed in file: " + file.getAbsolutePath());
+        System.in.read();
+
+        dw.close();
     }
 
     public static void main(String[] args) throws IOException {
