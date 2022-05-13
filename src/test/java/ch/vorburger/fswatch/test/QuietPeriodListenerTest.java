@@ -56,7 +56,6 @@ public class QuietPeriodListenerTest {
         await().atMost(1, SECONDS).until(() -> notified, is(true));
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
-
         notified = false;
         quietListener.onChange(null, null);
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
@@ -71,5 +70,4 @@ public class QuietPeriodListenerTest {
         await().atMost(1, SECONDS).until(() -> notified, is(true));
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
     }
-
 }

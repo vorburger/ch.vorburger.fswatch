@@ -19,12 +19,11 @@
  */
 package ch.vorburger.fswatch;
 
+import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
+import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-
-import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
-import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 
 /**
  * Builder which watches one single file for changes.

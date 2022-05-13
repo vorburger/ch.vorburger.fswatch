@@ -19,11 +19,9 @@
  */
 package ch.vorburger.fswatch;
 
+import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.WatchEvent.Kind;
-
-import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 
 /**
  * main() for DirectoryWatcher.
@@ -45,10 +43,10 @@ public class DirectoryWatcherMain {
         File dir = new File(args[0]);
         DirectoryWatcherImpl dw = (DirectoryWatcherImpl) new DirectoryWatcherBuilder()
         		.path(dir)
-        		.eventKinds(new ChangeKind[] { ChangeKind.CREATED, ChangeKind.MODIFIED, ChangeKind.DELETED })
+        		.eventKinds(ChangeKind.CREATED, ChangeKind.MODIFIED, ChangeKind.DELETED)
                 // Using explicit anonymous inner classes instead of Lambdas for clarity to readers
                 .listener((path, changeKind) -> System.out.println(changeKind.toString() + " " + path.toString()))
-                .exceptionHandler(t -> t.printStackTrace()).build();
+                .exceptionHandler(Throwable::printStackTrace).build();
 
         // This is just because it's a main(), you normally would NOT do this:
         dw.thread.join();

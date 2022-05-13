@@ -19,11 +19,10 @@
  */
 package ch.vorburger.fswatch;
 
-import java.nio.file.Path;
-
 import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
 import ch.vorburger.fswatch.DirectoryWatcher.Listener;
+import java.nio.file.Path;
 
 /**
  * Listener which only notifies by delegating to another wrapped Listener after a certain quiet period.

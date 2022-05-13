@@ -19,14 +19,13 @@
  */
 package ch.vorburger.fswatch;
 
+import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
+import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
+import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
-
-import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
-import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
-import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 
 /**
  * Builder for {@link DirectoryWatcher}.

@@ -27,9 +27,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.vorburger.fswatch.DirectoryWatcher;
+import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 import ch.vorburger.fswatch.DirectoryWatcherBuilder;
 import ch.vorburger.fswatch.FileWatcherBuilder;
-import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import java.io.File;
@@ -267,5 +267,4 @@ public class DirectoryAndFileWatcherTest {
     public void testDirectoryWatcherRelativePathNPE() throws Throwable {
         new DirectoryWatcherBuilder().path(FileSystems.getDefault().getPath(".")).listener((path, changeKind) -> {}).build().close();
     }
-
 }
