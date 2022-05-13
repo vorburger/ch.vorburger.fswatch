@@ -55,11 +55,11 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
     protected final WatchService watcher = FileSystems.getDefault().newWatchService(); // better final, as it will be accessed by both threads (normally OK either way, but still)
     protected final Thread thread;
     protected final List<ChangeKind> changeKindsList = new ArrayList<>();
-    
+
     protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler) throws IOException {
         this(watchSubDirectories,watchBasePath,listener,fileFilter,exceptionHandler, new ChangeKind[] {ChangeKind.MODIFIED, ChangeKind.DELETED});
     }
-    
+
     // protected because typical code should use the DirectoryWatcherBuilder instead of this directly
     protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler, ChangeKind[] eventKinds) throws IOException {
         if (!watchBasePath.toFile().isDirectory()) {
@@ -99,17 +99,15 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
                     Path absolutePath = watchKeyWatchablePath.resolve(relativePath);
                     log.trace("Received {} for: {}", kind.name(), absolutePath);
 
-                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                        if (Files.isDirectory(absolutePath)) { // don't NOFOLLOW_LINKS
-                            try {
-                                register(watchSubDirectories, watchBasePath, fileFilter);
-                            } catch (IOException e) {
-                                exceptionHandler.onException(e);
-                            }
+                    if (kind == StandardWatchEventKinds.ENTRY_CREATE && Files.isDirectory(absolutePath)) { // don't NOFOLLOW_LINKS
+                        try {
+                            register(watchSubDirectories, watchBasePath, fileFilter);
+                        } catch (IOException e) {
+                            exceptionHandler.onException(e);
                         }
                     }
 
-                   
+
                         try {
                             ChangeKind ourKind = null;
                             if (kind ==  StandardWatchEventKinds.ENTRY_CREATE) {
@@ -125,11 +123,11 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
                         } catch (Throwable e) {
                             exceptionHandler.onException(e);
                         }
-                    
+
                 }
                 key.reset();
             }
-            
+
         };
         String threadName = DirectoryWatcherImpl.class.getSimpleName() + ": " + watchBasePath.toString();
         thread = new Thread(r, threadName);
@@ -141,7 +139,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
         });
         thread.start();
     }
-    
+
 
     protected void register(boolean watchSubDirectories, final Path path, FileFilter fileFilter) throws IOException {
         if (watchSubDirectories) {
@@ -189,5 +187,4 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
     public String toString() {
         return thread.getName();
     }
-
 }

@@ -63,7 +63,7 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
 
         protected FileWatcherListener(Path fileToWatch, Listener listenerToWrap) {
             this.fileToWatch = fileToWatch;
-            this.delegate = listenerToWrap;
+            delegate = listenerToWrap;
         }
 
         @Override
@@ -73,6 +73,4 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
             }
         }
     }
-
-
 }

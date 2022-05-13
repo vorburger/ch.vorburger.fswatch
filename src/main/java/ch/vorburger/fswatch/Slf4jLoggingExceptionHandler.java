@@ -35,5 +35,4 @@ public class Slf4jLoggingExceptionHandler implements ExceptionHandler {
     public void onException(Throwable t) {
         log.error("Oopsy daisy", t);
     }
-
 }

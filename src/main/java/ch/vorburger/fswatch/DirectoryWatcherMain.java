@@ -55,5 +55,4 @@ public class DirectoryWatcherMain {
         // (In this main() scenario this will unlikely ever actually get reached; this is just an illustration.)
         dw.close();
     }
-
 }

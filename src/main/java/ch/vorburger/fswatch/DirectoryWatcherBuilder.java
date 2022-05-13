@@ -40,17 +40,17 @@ public class DirectoryWatcherBuilder {
     protected ExceptionHandler exceptionHandler = new Slf4jLoggingExceptionHandler();
     protected long quietPeriodInMS = 100;
     protected FileFilter fileFilter;
-    protected ChangeKind[] eventKinds = new ChangeKind[] { ChangeKind.DELETED, ChangeKind.MODIFIED };
+    protected ChangeKind[] eventKinds = { ChangeKind.DELETED, ChangeKind.MODIFIED };
 
     public DirectoryWatcherBuilder path(File directory) {
         return path(directory.toPath());
     }
 
     public DirectoryWatcherBuilder path(Path directory) {
-        if (this.path != null) {
+        if (path != null) {
             throw new IllegalStateException("path already set");
         }
-        this.path = directory;
+        path = directory;
         return this;
     }
 
@@ -106,16 +106,16 @@ public class DirectoryWatcherBuilder {
     }
 
     protected void check() {
-        if (this.path == null) {
+        if (path == null) {
             throw new IllegalStateException("path not set");
         }
-        if (!this.path.toFile().exists()) {
-            throw new IllegalStateException("path does not exist: " + this.path.toString());
+        if (!path.toFile().exists()) {
+            throw new IllegalStateException("path does not exist: " + path.toString());
         }
-        if (this.listener == null) {
+        if (listener == null) {
             throw new IllegalStateException("listener not set");
         }
-        if (this.exceptionHandler == null) {
+        if (exceptionHandler == null) {
             throw new IllegalStateException("exceptionHandler not set");
         }
     }
@@ -123,5 +123,4 @@ public class DirectoryWatcherBuilder {
     protected Listener getQuietListener(Listener listenerToWrap) {
         return new QuietPeriodListener(quietPeriodInMS, listenerToWrap, exceptionHandler);
     }
-
 }
