@@ -32,6 +32,7 @@ import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 import ch.vorburger.fswatch.DirectoryWatcherBuilder;
 import ch.vorburger.fswatch.FileWatcherBuilder;
 import com.google.common.io.Files;
+import com.google.common.io.MoreFiles;
 import java.io.File;
 import java.nio.file.FileSystems;
 import org.junit.BeforeClass;
@@ -151,6 +152,33 @@ public class DirectoryAndFileWatcherTest {
     }
 
     @Test
+    public void testExistingFilesDirectoryWatcher() throws Throwable {
+        assertableExceptionHandler = new AssertableExceptionHandler();
+        File file = new File("target/tests/DirectoryWatcherTest/existing");
+        MoreFiles.deleteRecursively(file.getParentFile().toPath());
+        file.getParentFile().mkdirs();
+        Files.asCharSink(file, US_ASCII).write("yo");
+        changed = false;
+        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().existingFiles(true).path(file.getParentFile()).listener((p, c) -> {
+            if (!p.toFile().isDirectory()) {
+                assertFalse(changed); // We want this to only be called once
+                changed = true;
+            }
+        }).exceptionHandler(assertableExceptionHandler).build()) {
+            // We want it to call the listener once for setup for the file (not the directory), even without any change
+            assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+            await().atMost(5, SECONDS).until(() -> changed, is(true));
+            assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+
+            changed = false;
+            Files.asCharSink(file, US_ASCII).write("ho");
+            assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+            await().atMost(30, SECONDS).until(() -> changed, is(true));
+            assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+        }
+    }
+
+    @Test
     public void testFilteredDirectoryWatcher() throws Throwable {
         assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/DirectoryWatcherTest/some/sub/directory");
@@ -198,7 +226,7 @@ public class DirectoryAndFileWatcherTest {
     }
 
     @Test
-    public void testFileWatcherWithSelectedChangekinds() throws Throwable {
+    public void testFileWatcherWithSelectedChangeKinds() throws Throwable {
         assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/FileWatcherTest/");
         final File subDir = new File(dir.getParentFile(), "subDir");
