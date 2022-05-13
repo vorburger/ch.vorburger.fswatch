@@ -57,7 +57,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
     protected final List<ChangeKind> changeKindsList = new ArrayList<>();
     
     protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler) throws IOException {
-    	this(watchSubDirectories,watchBasePath,listener,fileFilter,exceptionHandler, new ChangeKind[] {ChangeKind.MODIFIED, ChangeKind.DELETED});
+        this(watchSubDirectories,watchBasePath,listener,fileFilter,exceptionHandler, new ChangeKind[] {ChangeKind.MODIFIED, ChangeKind.DELETED});
     }
     
     // protected because typical code should use the DirectoryWatcherBuilder instead of this directly
@@ -113,11 +113,11 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
                         try {
                             ChangeKind ourKind = null;
                             if (kind ==  StandardWatchEventKinds.ENTRY_CREATE) {
-                            	ourKind = ChangeKind.CREATED;
+                                ourKind = ChangeKind.CREATED;
                             } else if (kind ==  StandardWatchEventKinds.ENTRY_MODIFY) {
-                            	ourKind = ChangeKind.MODIFIED;
+                                ourKind = ChangeKind.MODIFIED;
                             } else {
-                            	ourKind = ChangeKind.DELETED;
+                                ourKind = ChangeKind.DELETED;
                             }
                             if (changeKindsList.contains(ourKind)) { // Only send the evnts that the client is interested in
                                listener.onChange(absolutePath, ourKind);

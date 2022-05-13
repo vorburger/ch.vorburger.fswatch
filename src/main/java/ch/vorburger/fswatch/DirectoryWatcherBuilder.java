@@ -62,8 +62,8 @@ public class DirectoryWatcherBuilder {
         return this;
     }
     public DirectoryWatcherBuilder eventKinds(ChangeKind... eventKinds) {
-    	this.eventKinds = eventKinds;
-    	return this;
+        this.eventKinds = eventKinds;
+        return this;
     }
 
     public DirectoryWatcherBuilder exceptionHandler(ExceptionHandler exceptionHandler) {

@@ -42,8 +42,8 @@ public class DirectoryWatcherMain {
 
         File dir = new File(args[0]);
         DirectoryWatcherImpl dw = (DirectoryWatcherImpl) new DirectoryWatcherBuilder()
-        		.path(dir)
-        		.eventKinds(ChangeKind.CREATED, ChangeKind.MODIFIED, ChangeKind.DELETED)
+                .path(dir)
+                .eventKinds(ChangeKind.CREATED, ChangeKind.MODIFIED, ChangeKind.DELETED)
                 // Using explicit anonymous inner classes instead of Lambdas for clarity to readers
                 .listener((path, changeKind) -> System.out.println(changeKind.toString() + " " + path.toString()))
                 .exceptionHandler(Throwable::printStackTrace).build();
