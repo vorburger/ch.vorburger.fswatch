@@ -25,7 +25,9 @@ import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * Builder for {@link DirectoryWatcher}.
@@ -41,6 +43,7 @@ public class DirectoryWatcherBuilder {
     protected long quietPeriodInMS = 100;
     protected FileFilter fileFilter;
     protected ChangeKind[] eventKinds = { ChangeKind.DELETED, ChangeKind.MODIFIED };
+    protected boolean existingFiles = false;
 
     public DirectoryWatcherBuilder path(File directory) {
         return path(directory.toPath());
@@ -86,6 +89,18 @@ public class DirectoryWatcherBuilder {
         return this;
     }
 
+    /**
+     * Whether the Listener should initially be invoked once for each existing file (but not directory).
+     * Defaults to false.
+     *
+     * @param existing true if yes, false if not
+     * @return this
+     */
+    public DirectoryWatcherBuilder existingFiles(boolean existing) {
+        existingFiles = existing;
+        return this;
+    }
+
     public DirectoryWatcher build() throws IOException {
         check();
         if (!path.toFile().isDirectory()) {
@@ -100,6 +115,18 @@ public class DirectoryWatcherBuilder {
     protected void firstListenerNotification() {
         try {
             listener.onChange(path, ChangeKind.MODIFIED);
+
+            if (existingFiles) {
+                try (Stream<Path> stream = Files.walk(path).filter(Files::isRegularFile)) {
+                    stream.forEach(file -> {
+                        try {
+                            listener.onChange(file, ChangeKind.MODIFIED);
+                        } catch (Throwable e) {
+                            exceptionHandler.onException(e);
+                        }
+                    });
+                }
+            }
         } catch (Throwable e) {
             exceptionHandler.onException(e);
         }
