@@ -36,7 +36,7 @@ public class ExampleMain {
 
     private static void watchDirectoryExample() throws IOException {
         File dir = new File(".");
-        DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir)
+        DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).existingFiles(false)
                 .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build();
 
         System.out.println("Press Enter to stop; now watching for changed in directory: " + dir.getAbsolutePath());
@@ -47,7 +47,7 @@ public class ExampleMain {
 
     private static void watchFileExample() throws IOException {
         File file = new File("pom.xml");
-        DirectoryWatcher dw = new FileWatcherBuilder().path(file)
+        DirectoryWatcher dw = new FileWatcherBuilder().path(file).existingFiles(true)
                 .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build();
 
         System.out.println("Press Enter to stop; now watching for changed in file: " + file.getAbsolutePath());
