@@ -20,6 +20,7 @@
 package ch.vorburger.fswatch.test;
 
 import static com.google.common.base.Charsets.US_ASCII;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.is;
@@ -35,6 +36,7 @@ import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import java.io.File;
 import java.nio.file.FileSystems;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -48,13 +50,11 @@ public class DirectoryAndFileWatcherTest {
     AssertableExceptionHandler assertableExceptionHandler;
     volatile boolean changed;
 
-    @BeforeClass
-    static public void configureSlf4jSimpleShowAllLogs() {
+    @BeforeClass static public void configureSlf4jSimpleShowAllLogs() {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
     }
 
-    @Test
-    public void testFileWatcher() throws Throwable {
+    @Test public void testFileWatcher() throws Throwable {
         assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/FileWatcherTest/");
         final File subDir = new File(dir.getParentFile(), "subDir");
@@ -105,8 +105,7 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test
-    public void testDirectoryWatcher() throws Throwable {
+    @Test public void testDirectoryWatcher() throws Throwable {
         assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/DirectoryWatcherTest/some/sub/directory");
         dir.mkdirs();
@@ -151,8 +150,7 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test
-    public void testExistingFilesDirectoryWatcher() throws Throwable {
+    @Test public void testExistingFilesDirectoryWatcher() throws Throwable {
         assertableExceptionHandler = new AssertableExceptionHandler();
         File file = new File("target/tests/DirectoryWatcherTest/existing");
         MoreFiles.deleteRecursively(file.getParentFile().toPath());
@@ -178,8 +176,7 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test
-    public void testFilteredDirectoryWatcher() throws Throwable {
+    @Test public void testFilteredDirectoryWatcher() throws Throwable {
         assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/DirectoryWatcherTest/some/sub/directory");
         dir.mkdirs();
@@ -209,8 +206,7 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test(expected = AssertionError.class)
-    public void testDirectoryWatcherListenerExceptionPropagation() throws Throwable {
+    @Test(expected = AssertionError.class) public void testDirectoryWatcherListenerExceptionPropagation() throws Throwable {
         assertableExceptionHandler = new AssertableExceptionHandler();
         final File testFile = new File("target/tests/DirectoryWatcherTest/someFile");
         testFile.delete();
@@ -222,6 +218,29 @@ public class DirectoryAndFileWatcherTest {
 
             Files.asCharSink(testFile, US_ASCII).write("yo");
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+        }
+    }
+
+    @Test
+    public void testOverwriteExistingFile() throws Throwable {
+        assertableExceptionHandler = new AssertableExceptionHandler();
+        final File dir = new File("target/tests/DirectoryWatcherTest/existing");
+        dir.mkdirs();
+        final File file = File.createTempFile("test", "txt");
+        final File to = dir.toPath().resolve("test.txt").toFile();
+        Files.copy(file, to);
+        AtomicReference<ChangeKind> change = new AtomicReference<>();
+
+        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).listener((p, c) -> {
+            System.out.println("c = " + c);
+            change.set(c);
+        }).exceptionHandler(assertableExceptionHandler).build()) {
+            // We want it to call the listener once for setup, even without any change
+            assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+            java.nio.file.Files.move(file.toPath(), to.toPath(), REPLACE_EXISTING);
+
+//             Files.move(file, to);
+            await().atMost(5, SECONDS).until(change::get, is(ChangeKind.CREATED));
         }
     }
 
