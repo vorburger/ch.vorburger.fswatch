@@ -45,7 +45,7 @@ public class DirectoryWatcherMain {
                 .path(dir)
                 .eventKinds(ChangeKind.CREATED, ChangeKind.MODIFIED, ChangeKind.DELETED)
                 // Using explicit anonymous inner classes instead of Lambdas for clarity to readers
-                .listener((path, changeKind) -> System.out.println(changeKind.toString() + " " + path.toString()))
+                .listener((path, changeKind) -> System.out.println(changeKind + " " + path))
                 .exceptionHandler(Throwable::printStackTrace).build();
 
         // This is just because it's a main(), you normally would NOT do this:
