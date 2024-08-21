@@ -29,7 +29,7 @@ import java.nio.file.Path;
  */
 public interface DirectoryWatcher extends Closeable {
 
-    public enum ChangeKind {
+    enum ChangeKind {
         MODIFIED, DELETED, CREATED
     }
 

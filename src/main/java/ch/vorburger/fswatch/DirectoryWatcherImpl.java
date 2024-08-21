@@ -69,7 +69,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
             @Nullable FileFilter fileFilter, ExceptionHandler exceptionHandler, ChangeKind[] eventKinds)
             throws IOException {
         if (!watchBasePath.toFile().isDirectory()) {
-            throw new IllegalArgumentException("Not a directory: " + watchBasePath.toString());
+            throw new IllegalArgumentException("Not a directory: " + watchBasePath);
         }
         changeKindsList.addAll(Arrays.asList(eventKinds));
 
@@ -100,7 +100,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
 
                     Path relativePath = (Path) event.context();
                     if (relativePath == null) {
-                        log.error("Received {} but event.context() == null: {}", kind.name(), event.toString());
+                        log.error("Received {} but event.context() == null: {}", kind.name(), event);
                         continue;
                     }
                     Path absolutePath = watchKeyWatchablePath.resolve(relativePath);
@@ -135,7 +135,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
             }
 
         };
-        String threadName = DirectoryWatcherImpl.class.getSimpleName() + ": " + watchBasePath.toString();
+        String threadName = DirectoryWatcherImpl.class.getSimpleName() + ": " + watchBasePath;
         thread = new Thread(r, threadName);
         thread.setDaemon(true);
         // Because we're catch-ing expected exceptions above, this normally
@@ -158,7 +158,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
     private void registerOne(final Path path) throws IOException {
         path.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         if (log.isTraceEnabled()) {
-            log.trace("Registered: {}", path.toString());
+            log.trace("Registered: {}", path);
         }
     }
 
