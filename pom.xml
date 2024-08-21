@@ -68,14 +68,14 @@
   <licenses>
     <license>
       <name>Apache 2</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
 
   <organization>
     <name>Michael Vorburger.ch</name>
-    <url>http://www.vorburger.ch</url>
+    <url>https://www.vorburger.ch</url>
   </organization>
 
   <developers>
@@ -83,7 +83,7 @@
       <id>vorburger</id>
       <name>Michael Vorburger</name>
       <email>mike@vorburger.ch</email>
-      <url>http://www.vorburger.ch</url>
+      <url>https://www.vorburger.ch</url>
     </developer>
   </developers>
 

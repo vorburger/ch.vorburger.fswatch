@@ -216,10 +216,8 @@ public class DirectoryAndFileWatcherTest {
         testFile.delete();
         final File dir = testFile.getParentFile();
         dir.mkdirs();
-        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).quietPeriodInMS(0).listener((p, c) -> {
-            fail("duh!");
-        }).exceptionHandler(assertableExceptionHandler).build()) {
-
+        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).quietPeriodInMS(0).listener(
+                (p, c) -> fail("duh!")).exceptionHandler(assertableExceptionHandler).build()) {
             Files.asCharSink(testFile, US_ASCII).write("yo");
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         }

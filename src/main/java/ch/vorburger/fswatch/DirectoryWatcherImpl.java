@@ -140,9 +140,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
         thread.setDaemon(true);
         // Because we're catch-ing expected exceptions above, this normally
         // should never be needed, but still be better safe than sorry.. ;-)
-        thread.setUncaughtExceptionHandler((t, e) -> {
-            exceptionHandler.onException(e);
-        });
+        thread.setUncaughtExceptionHandler((t, e) -> exceptionHandler.onException(e));
         thread.start();
     }
 
@@ -166,7 +164,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
 
     private void registerAll(final Path basePath, @Nullable FileFilter fileFilter) throws IOException {
         // register basePath directory and sub-directories
-        Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(basePath, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 if (fileFilter == null || !fileFilter.accept(dir.toFile())) {
