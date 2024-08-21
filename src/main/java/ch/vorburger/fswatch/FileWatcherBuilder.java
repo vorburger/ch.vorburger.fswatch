@@ -19,11 +19,12 @@
  */
 package ch.vorburger.fswatch;
 
-import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
-import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+
+import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
+import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 
 /**
  * Builder which watches one single file for changes.
@@ -32,23 +33,38 @@ import java.nio.file.Path;
  */
 public class FileWatcherBuilder extends DirectoryWatcherBuilder {
 
-    @Override public FileWatcherBuilder path(File fileNotDirectory) {
+    @Override
+    public FileWatcherBuilder path(File fileNotDirectory) {
         return (FileWatcherBuilder) super.path(fileNotDirectory.getAbsoluteFile());
     }
 
-    @Override public FileWatcherBuilder path(Path fileNotDirectory) {
+    @Override
+    public FileWatcherBuilder path(Path fileNotDirectory) {
         return (FileWatcherBuilder) super.path(fileNotDirectory.toAbsolutePath());
     }
 
     @Override
     public DirectoryWatcher build() throws IOException {
-        check();
+        // Copy/paste from parent class, for null safety; please keep in sync
+        if (path == null)
+            throw new IllegalStateException("path not set");
+        if (!path.toFile().exists())
+            throw new IllegalStateException("path does not exist: " + path.toString());
+        if (listener == null)
+            throw new IllegalStateException("listener not set");
+        if (!path.toFile().isDirectory())
+            throw new IllegalStateException(
+                    "When using DirectoryWatcherBuilder, set path() to a directory, not a file (use FileWatcherBuilder to watch a single file)");
         if (!path.toFile().isFile()) {
-            throw new IllegalStateException("When using FileWatcherBuilder, set path() to a single file, not a directory (use DirectoryWatcherBuilder to watch a directory, and it's subdirectories)");
+            throw new IllegalStateException(
+                    "When using FileWatcherBuilder, set path() to a single file, not a directory (use DirectoryWatcherBuilder to watch a directory, and it's subdirectories)");
         }
         // NOTE We do want to wrap the FileWatcherListener inside the QuietPeriodListener, and not the other way around!
         Listener wrap = getQuietListener(new FileWatcherListener(path, listener));
-        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(false, path.getParent(), wrap, fileFilter, exceptionHandler, eventKinds);
+        Path parent = path.getParent();
+        if (parent == null) throw new IllegalArgumentException("path does not have a parent: " + parent);
+        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(false, parent, wrap, fileFilter,
+                exceptionHandler, eventKinds);
         firstListenerNotification();
         return watcher;
     }

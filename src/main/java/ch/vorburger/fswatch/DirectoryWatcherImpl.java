@@ -40,6 +40,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +58,16 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
     protected final Thread thread;
     protected final List<ChangeKind> changeKindsList = new ArrayList<>();
 
-    protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler) throws IOException {
-        this(watchSubDirectories,watchBasePath,listener,fileFilter,exceptionHandler, new ChangeKind[] {ChangeKind.MODIFIED, ChangeKind.DELETED});
+    protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener,
+            FileFilter fileFilter, ExceptionHandler exceptionHandler) throws IOException {
+        this(watchSubDirectories, watchBasePath, listener, fileFilter, exceptionHandler,
+                new ChangeKind[] { ChangeKind.MODIFIED, ChangeKind.DELETED });
     }
 
     // protected because typical code should use the DirectoryWatcherBuilder instead of this directly
-    protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener, FileFilter fileFilter, ExceptionHandler exceptionHandler, ChangeKind[] eventKinds) throws IOException {
+    protected DirectoryWatcherImpl(boolean watchSubDirectories, final Path watchBasePath, final Listener listener,
+            @Nullable FileFilter fileFilter, ExceptionHandler exceptionHandler, ChangeKind[] eventKinds)
+            throws IOException {
         if (!watchBasePath.toFile().isDirectory()) {
             throw new IllegalArgumentException("Not a directory: " + watchBasePath.toString());
         }
@@ -74,7 +80,8 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
                 try {
                     key = watcher.take();
                 } catch (ClosedWatchServiceException e) {
-                    log.debug("WatchService take() interrupted by ClosedWatchServiceException, terminating Thread (as planned).");
+                    log.debug(
+                            "WatchService take() interrupted by ClosedWatchServiceException, terminating Thread (as planned).");
                     return;
                 } catch (InterruptedException e) {
                     log.debug("Thread InterruptedException, terminating (as planned, if caused by close()).");
@@ -107,22 +114,21 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
                         }
                     }
 
-
-                        try {
-                            ChangeKind ourKind = null;
-                            if (kind ==  StandardWatchEventKinds.ENTRY_CREATE) {
-                                ourKind = ChangeKind.CREATED;
-                            } else if (kind ==  StandardWatchEventKinds.ENTRY_MODIFY) {
-                                ourKind = ChangeKind.MODIFIED;
-                            } else {
-                                ourKind = ChangeKind.DELETED;
-                            }
-                            if (changeKindsList.contains(ourKind)) { // Only send the evnts that the client is interested in
-                               listener.onChange(absolutePath, ourKind);
-                            }
-                        } catch (Throwable e) {
-                            exceptionHandler.onException(e);
+                    try {
+                        ChangeKind ourKind = null;
+                        if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                            ourKind = ChangeKind.CREATED;
+                        } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                            ourKind = ChangeKind.MODIFIED;
+                        } else {
+                            ourKind = ChangeKind.DELETED;
                         }
+                        if (changeKindsList.contains(ourKind)) { // Only send the evnts that the client is interested in
+                            listener.onChange(absolutePath, ourKind);
+                        }
+                    } catch (Throwable e) {
+                        exceptionHandler.onException(e);
+                    }
 
                 }
                 key.reset();
@@ -140,8 +146,8 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
         thread.start();
     }
 
-
-    protected void register(boolean watchSubDirectories, final Path path, FileFilter fileFilter) throws IOException {
+    private void register(boolean watchSubDirectories, final Path path, @Nullable FileFilter fileFilter)
+            throws IOException {
         if (watchSubDirectories) {
             registerAll(path, fileFilter);
         } else {
@@ -149,7 +155,7 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
         }
     }
 
-    protected void registerOne(final Path path) throws IOException {
+    private void registerOne(final Path path) throws IOException {
         path.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         if (log.isTraceEnabled()) {
             log.trace("Registered: {}", path.toString());
@@ -158,12 +164,11 @@ public class DirectoryWatcherImpl implements DirectoryWatcher {
 
     // Implementation inspired by https://docs.oracle.com/javase/tutorial/essential/io/examples/WatchDir.java, from https://docs.oracle.com/javase/tutorial/essential/io/notification.html
 
-    protected void registerAll(final Path basePath, FileFilter fileFilter) throws IOException {
+    private void registerAll(final Path basePath, @Nullable FileFilter fileFilter) throws IOException {
         // register basePath directory and sub-directories
         Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
-            {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 if (fileFilter == null || !fileFilter.accept(dir.toFile())) {
                     registerOne(dir);
                 }
