@@ -19,15 +19,21 @@
  */
 package ch.vorburger.fswatch;
 
-import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
-import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
-import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.stream.Stream;
+
+import org.jspecify.annotations.Nullable;
+
+import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
+import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
+import ch.vorburger.fswatch.DirectoryWatcher.Listener;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Builder for {@link DirectoryWatcher}.
@@ -37,11 +43,11 @@ import java.util.stream.Stream;
 @SuppressWarnings("hiding")
 public class DirectoryWatcherBuilder {
 
-    protected Path path;
-    protected Listener listener;
+    protected @Nullable Path path;
+    protected @Nullable Listener listener;
     protected ExceptionHandler exceptionHandler = new Slf4jLoggingExceptionHandler();
     protected long quietPeriodInMS = 100;
-    protected FileFilter fileFilter;
+    protected @Nullable FileFilter fileFilter;
     protected ChangeKind[] eventKinds = { ChangeKind.DELETED, ChangeKind.MODIFIED };
     protected boolean existingFiles = false;
 
@@ -64,13 +70,14 @@ public class DirectoryWatcherBuilder {
         this.listener = listener;
         return this;
     }
+
     public DirectoryWatcherBuilder eventKinds(ChangeKind... eventKinds) {
         this.eventKinds = eventKinds;
         return this;
     }
 
     public DirectoryWatcherBuilder exceptionHandler(ExceptionHandler exceptionHandler) {
-        this.exceptionHandler = exceptionHandler;
+        this.exceptionHandler = requireNonNull(exceptionHandler);
         return this;
     }
 
@@ -102,17 +109,28 @@ public class DirectoryWatcherBuilder {
     }
 
     public DirectoryWatcher build() throws IOException {
-        check();
-        if (!path.toFile().isDirectory()) {
-            throw new IllegalStateException("When using DirectoryWatcherBuilder, set path() to a directory, not a file (use FileWatcherBuilder to watch a single file)");
-        }
-        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(true, path, getQuietListener(listener), fileFilter, exceptionHandler, eventKinds);
+        // Copy/paste into child class, for null safety; please keep in sync
+        if (path == null)
+            throw new IllegalStateException("path not set");
+        if (!path.toFile().exists())
+            throw new IllegalStateException("path does not exist: " + path.toString());
+        if (listener == null)
+            throw new IllegalStateException("listener not set");
+        if (!path.toFile().isDirectory())
+            throw new IllegalStateException(
+                    "When using DirectoryWatcherBuilder, set path() to a directory, not a file (use FileWatcherBuilder to watch a single file)");
+        DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(true, path, getQuietListener(listener), fileFilter,
+                exceptionHandler, eventKinds);
         firstListenerNotification();
         return watcher;
     }
 
     // We intentionally want to first call the listener once for setup, even without any change detected
     protected void firstListenerNotification() {
+        if (path == null)
+            throw new IllegalStateException("path not set");
+        if (listener == null)
+            throw new IllegalStateException("listener not set");
         try {
             listener.onChange(path, ChangeKind.MODIFIED);
 
@@ -129,21 +147,6 @@ public class DirectoryWatcherBuilder {
             }
         } catch (Throwable e) {
             exceptionHandler.onException(e);
-        }
-    }
-
-    protected void check() {
-        if (path == null) {
-            throw new IllegalStateException("path not set");
-        }
-        if (!path.toFile().exists()) {
-            throw new IllegalStateException("path does not exist: " + path.toString());
-        }
-        if (listener == null) {
-            throw new IllegalStateException("listener not set");
-        }
-        if (exceptionHandler == null) {
-            throw new IllegalStateException("exceptionHandler not set");
         }
     }
 
