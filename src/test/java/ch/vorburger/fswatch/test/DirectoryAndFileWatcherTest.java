@@ -35,6 +35,8 @@ import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import java.io.File;
 import java.nio.file.FileSystems;
+
+import org.jspecify.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,7 +47,6 @@ import org.junit.Test;
  */
 public class DirectoryAndFileWatcherTest {
 
-    AssertableExceptionHandler assertableExceptionHandler;
     volatile boolean changed;
 
     @BeforeClass
@@ -55,7 +56,7 @@ public class DirectoryAndFileWatcherTest {
 
     @Test
     public void testFileWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/FileWatcherTest/");
         final File subDir = new File(dir.getParentFile(), "subDir");
         dir.mkdirs();
@@ -107,7 +108,7 @@ public class DirectoryAndFileWatcherTest {
 
     @Test
     public void testDirectoryWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/DirectoryWatcherTest/some/sub/directory");
         dir.mkdirs();
         final File subDir = new File(dir.getParentFile(), "another");
@@ -153,7 +154,7 @@ public class DirectoryAndFileWatcherTest {
 
     @Test
     public void testExistingFilesDirectoryWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         File file = new File("target/tests/DirectoryWatcherTest/existing");
         MoreFiles.deleteRecursively(file.getParentFile().toPath());
         file.getParentFile().mkdirs();
@@ -180,7 +181,7 @@ public class DirectoryAndFileWatcherTest {
 
     @Test
     public void testFilteredDirectoryWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/DirectoryWatcherTest/some/sub/directory");
         dir.mkdirs();
         final File subDir = new File(dir.getParentFile(), "another");
@@ -211,7 +212,7 @@ public class DirectoryAndFileWatcherTest {
 
     @Test(expected = AssertionError.class)
     public void testDirectoryWatcherListenerExceptionPropagation() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File testFile = new File("target/tests/DirectoryWatcherTest/someFile");
         testFile.delete();
         final File dir = testFile.getParentFile();
@@ -225,7 +226,7 @@ public class DirectoryAndFileWatcherTest {
 
     @Test
     public void testFileWatcherWithSelectedChangeKinds() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/FileWatcherTest/");
         final File subDir = new File(dir.getParentFile(), "subDir");
         dir.mkdirs();

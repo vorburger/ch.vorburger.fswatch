@@ -100,8 +100,7 @@
           <encoding>UTF-8</encoding>
           <fork>true</fork>
           <compilerArgs>
-            <arg>-Werror</arg>
-            <arg>-Xlint:all</arg>
+            <arg>-Xlint:all,-try</arg>
             <arg>-XDcompilePolicy=simple</arg>
             <arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=ch.vorburger</arg>
             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>

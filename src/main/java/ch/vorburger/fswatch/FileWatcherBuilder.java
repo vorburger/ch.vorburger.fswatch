@@ -52,9 +52,6 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
             throw new IllegalStateException("path does not exist: " + path.toString());
         if (listener == null)
             throw new IllegalStateException("listener not set");
-        if (!path.toFile().isDirectory())
-            throw new IllegalStateException(
-                    "When using DirectoryWatcherBuilder, set path() to a directory, not a file (use FileWatcherBuilder to watch a single file)");
         if (!path.toFile().isFile()) {
             throw new IllegalStateException(
                     "When using FileWatcherBuilder, set path() to a single file, not a directory (use DirectoryWatcherBuilder to watch a directory, and it's subdirectories)");

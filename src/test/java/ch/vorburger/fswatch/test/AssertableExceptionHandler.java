@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
 import ch.vorburger.fswatch.Slf4jLoggingExceptionHandler;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ public class AssertableExceptionHandler extends Slf4jLoggingExceptionHandler imp
 
     // This probably isn't 100% concurrency kosher, but "good enough" to cover the tests..
     private final Object lockObject = new Object();
-    private volatile Throwable lastThrowable = null;
+    private volatile @Nullable Throwable lastThrowable = null;
 
     @Override
     public void onException(Throwable t) {
@@ -51,6 +52,7 @@ public class AssertableExceptionHandler extends Slf4jLoggingExceptionHandler imp
         }
     }
 
+    @SuppressWarnings("ThreadPriorityCheck")
     public void assertNoErrorInTheBackgroundThread() throws Throwable {
         Thread.yield();
         Thread.sleep(100); // slow!
@@ -64,6 +66,7 @@ public class AssertableExceptionHandler extends Slf4jLoggingExceptionHandler imp
         }
     }
 
+    @SuppressWarnings("ThreadPriorityCheck")
     public void assertErrorCaughtFromTheBackgroundThread() throws InterruptedException {
         Thread.yield();
         Thread.sleep(100);
@@ -73,12 +76,15 @@ public class AssertableExceptionHandler extends Slf4jLoggingExceptionHandler imp
         }
     }
 
+    @SuppressWarnings("ThreadPriorityCheck")
     public void assertErrorMessageCaughtFromTheBackgroundThreadContains(String message) throws InterruptedException {
         Thread.yield();
         Thread.sleep(100);
         synchronized (lockObject) {
             assertNotNull("Expected an error occuring in the background thread (but there wasn't)", lastThrowable);
-            assertTrue(lastThrowable.getMessage(), lastThrowable.getMessage().contains(message));
+            String lastThrowableMessage = lastThrowable.getMessage();
+            if (lastThrowableMessage == null) throw new IllegalStateException("lastThrowable has no message: " + lastThrowable);
+            assertTrue(lastThrowableMessage, lastThrowableMessage.contains(message));
             lastThrowable = null;
         }
     }
