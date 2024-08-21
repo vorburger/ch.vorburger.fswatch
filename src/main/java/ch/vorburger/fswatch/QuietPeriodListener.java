@@ -47,7 +47,7 @@ public class QuietPeriodListener implements Listener {
     }
 
     @Override
-    public synchronized void onChange(Path path, ChangeKind changeKind) throws Throwable {
+    public synchronized void onChange(Path path, ChangeKind changeKind) {
         if (thread != null && thread.isAlive()) {
             sleepAgain = true;
             //System.out.println("sleepAgain = true");

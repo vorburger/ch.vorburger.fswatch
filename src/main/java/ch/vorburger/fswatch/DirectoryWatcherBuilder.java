@@ -24,7 +24,6 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.jspecify.annotations.Nullable;

@@ -62,7 +62,7 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
         // NOTE We do want to wrap the FileWatcherListener inside the QuietPeriodListener, and not the other way around!
         Listener wrap = getQuietListener(new FileWatcherListener(path, listener));
         Path parent = path.getParent();
-        if (parent == null) throw new IllegalArgumentException("path does not have a parent: " + parent);
+        if (parent == null) throw new IllegalArgumentException("path does not have a parent: " + path);
         DirectoryWatcherImpl watcher = new DirectoryWatcherImpl(false, parent, wrap, fileFilter,
                 exceptionHandler, eventKinds);
         firstListenerNotification();

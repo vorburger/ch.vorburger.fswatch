@@ -5,7 +5,7 @@
 The following versions of this project are currently supported with security updates:
 
 | Version | Supported          |
-| ------- | ------------------ |
+|---------|--------------------|
 | `main`  | :white_check_mark: |
 | 1.3.x   | :white_check_mark: |
 | Older   | :x:                |
