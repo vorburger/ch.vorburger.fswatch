@@ -9,7 +9,6 @@ updates:
   open-pull-requests-limit: 99
   
 - package-ecosystem: "github-actions"
-  commit-message:
   directory: "/"
   schedule:
     interval: "monthly"
