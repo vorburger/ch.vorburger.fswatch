@@ -40,6 +40,12 @@ public class QuietPeriodListener implements Listener {
     protected @Nullable Thread thread;
     protected volatile boolean sleepAgain;
 
+    /**
+     * Constructor.
+     * @param quietPeriodInMS the quiet period in milliseconds
+     * @param listenerToWrap the listener to wrap
+     * @param exceptionHandler the exception handler
+     */
     public QuietPeriodListener(long quietPeriodInMS, Listener listenerToWrap, ExceptionHandler exceptionHandler) {
         this.quietPeriodInMS = quietPeriodInMS;
         this.delegate = listenerToWrap;

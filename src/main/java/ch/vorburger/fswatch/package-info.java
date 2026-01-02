@@ -17,6 +17,10 @@
  * limitations under the License.
  * #L%
  */
+
+/**
+ * Watch a directory and be notified on your Listener for changes in it.
+ */
 @NullMarked
 package ch.vorburger.fswatch;
 

@@ -29,8 +29,19 @@ import java.nio.file.Path;
  */
 public interface DirectoryWatcher extends Closeable {
 
+    /**
+     * The kind of change that occurred.
+     */
     enum ChangeKind {
-        MODIFIED, DELETED, CREATED
+
+        /** Directory or file was modified. */
+        MODIFIED,
+
+        /** Directory or file was deleted. */
+        DELETED,
+
+        /** Directory or file was created. */
+        CREATED
     }
 
     /**
@@ -50,10 +61,16 @@ public interface DirectoryWatcher extends Closeable {
      * Handles exceptions which occur during Listener onChange().
      */
     interface ExceptionHandler {
+        /**
+         * Called when an exception occurs.
+         * @param t the exception
+         */
         void onException(Throwable t);
     }
 
-    @Override String toString();
+    @Override
+    String toString();
 
-    @Override void close(); // do NOT throws (IO)Exception
+    @Override
+    void close(); // do NOT throws (IO)Exception
 }
