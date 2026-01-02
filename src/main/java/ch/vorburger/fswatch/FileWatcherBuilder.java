@@ -64,7 +64,7 @@ public class FileWatcherBuilder extends DirectoryWatcherBuilder {
             throw new IllegalStateException("listener not set");
         if (!path.toFile().isFile()) {
             throw new IllegalStateException(
-                    "When using FileWatcherBuilder, set path() to a single file, not a directory (use DirectoryWatcherBuilder to watch a directory, and it's subdirectories)");
+                    "When using FileWatcherBuilder, set path() to a single file, not a directory (use DirectoryWatcherBuilder to watch a directory, and its subdirectories)");
         }
         // NOTE We do want to wrap the FileWatcherListener inside the QuietPeriodListener, and not the other way around!
         Listener fileWatcherListener = new FileWatcherListener(path, listener);
