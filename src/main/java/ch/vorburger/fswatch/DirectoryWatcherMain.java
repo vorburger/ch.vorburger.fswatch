@@ -32,6 +32,12 @@ import java.io.IOException;
  */
 public class DirectoryWatcherMain {
 
+    /**
+     * Main method.
+     * @param args command line arguments
+     * @throws IOException if an I/O error occurs
+     * @throws InterruptedException if the thread is interrupted
+     */
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length < 1) {
             System.err.println("USAGE: <root-directory-to-watch-for-changes>");

@@ -50,10 +50,20 @@ public class DirectoryWatcherBuilder {
     protected ChangeKind[] eventKinds = { ChangeKind.DELETED, ChangeKind.MODIFIED };
     protected boolean existingFiles = false;
 
+    /**
+     * Set the path to watch.
+     * @param directory the path to watch
+     * @return this
+     */
     public DirectoryWatcherBuilder path(File directory) {
         return path(directory.toPath());
     }
 
+    /**
+     * Set the path to watch.
+     * @param directory the path to watch
+     * @return this
+     */
     public DirectoryWatcherBuilder path(Path directory) {
         if (path != null) {
             throw new IllegalStateException("path already set");
@@ -62,6 +72,11 @@ public class DirectoryWatcherBuilder {
         return this;
     }
 
+    /**
+     * Set the listener to be notified of changes.
+     * @param listener the listener to be notified of changes
+     * @return this
+     */
     public DirectoryWatcherBuilder listener(Listener listener) {
         if (this.listener != null) {
             throw new IllegalStateException("listener already set");
@@ -70,16 +85,31 @@ public class DirectoryWatcherBuilder {
         return this;
     }
 
+    /**
+     * Set the change kinds to listen for.
+     * @param eventKinds the change kinds to listen for
+     * @return this
+     */
     public DirectoryWatcherBuilder eventKinds(ChangeKind... eventKinds) {
         this.eventKinds = eventKinds;
         return this;
     }
 
+    /**
+     * Set the exception handler.
+     * @param exceptionHandler the exception handler
+     * @return this
+     */
     public DirectoryWatcherBuilder exceptionHandler(ExceptionHandler exceptionHandler) {
         this.exceptionHandler = requireNonNull(exceptionHandler);
         return this;
     }
 
+    /**
+     * Set the quiet period in milliseconds.
+     * @param quietPeriodInMS the quiet period in milliseconds
+     * @return this
+     */
     public DirectoryWatcherBuilder quietPeriodInMS(long quietPeriodInMS) {
         this.quietPeriodInMS = quietPeriodInMS;
         return this;

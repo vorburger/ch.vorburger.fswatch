@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * @author Michael Vorburger.ch
  */
 // intentionally package local, for now
-public class DirectoryWatcherImpl implements DirectoryWatcher {
+class DirectoryWatcherImpl implements DirectoryWatcher {
     private final static Logger log = LoggerFactory.getLogger(DirectoryWatcherImpl.class);
 
     protected final WatchService watcher = FileSystems.getDefault().newWatchService(); // better final, as it will be accessed by both threads (normally OK either way, but still)
