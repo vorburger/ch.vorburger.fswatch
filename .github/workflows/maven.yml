@@ -10,14 +10,14 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     permissions:
       # https://github.com/advanced-security/maven-dependency-submission-action?tab=readme-ov-file#pre-requisites
       contents: write
