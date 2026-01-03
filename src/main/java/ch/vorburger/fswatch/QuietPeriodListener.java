@@ -22,6 +22,8 @@ package ch.vorburger.fswatch;
 import ch.vorburger.fswatch.DirectoryWatcher.ChangeKind;
 import ch.vorburger.fswatch.DirectoryWatcher.ExceptionHandler;
 import ch.vorburger.fswatch.DirectoryWatcher.Listener;
+import org.jspecify.annotations.Nullable;
+
 import java.nio.file.Path;
 
 /**
@@ -35,9 +37,15 @@ public class QuietPeriodListener implements Listener {
     protected final long quietPeriodInMS;
     private final ExceptionHandler exceptionHandler;
 
-    protected Thread thread;
+    protected @Nullable Thread thread;
     protected volatile boolean sleepAgain;
 
+    /**
+     * Constructor.
+     * @param quietPeriodInMS the quiet period in milliseconds
+     * @param listenerToWrap the listener to wrap
+     * @param exceptionHandler the exception handler
+     */
     public QuietPeriodListener(long quietPeriodInMS, Listener listenerToWrap, ExceptionHandler exceptionHandler) {
         this.quietPeriodInMS = quietPeriodInMS;
         this.delegate = listenerToWrap;
@@ -45,7 +53,7 @@ public class QuietPeriodListener implements Listener {
     }
 
     @Override
-    public synchronized void onChange(Path path, ChangeKind changeKind) throws Throwable {
+    public synchronized void onChange(Path path, ChangeKind changeKind) {
         if (thread != null && thread.isAlive()) {
             sleepAgain = true;
             //System.out.println("sleepAgain = true");

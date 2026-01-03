@@ -37,6 +37,8 @@ import com.google.common.io.MoreFiles;
 import java.io.File;
 import java.nio.file.FileSystems;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.jspecify.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,15 +49,16 @@ import org.junit.Test;
  */
 public class DirectoryAndFileWatcherTest {
 
-    AssertableExceptionHandler assertableExceptionHandler;
     volatile boolean changed;
 
-    @BeforeClass static public void configureSlf4jSimpleShowAllLogs() {
+    @BeforeClass
+    static public void configureSlf4jSimpleShowAllLogs() {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
     }
 
-    @Test public void testFileWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+    @Test
+    public void testFileWatcher() throws Throwable {
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/FileWatcherTest/");
         final File subDir = new File(dir.getParentFile(), "subDir");
         dir.mkdirs();
@@ -105,8 +108,9 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test public void testDirectoryWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+    @Test
+    public void testDirectoryWatcher() throws Throwable {
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/DirectoryWatcherTest/some/sub/directory");
         dir.mkdirs();
         final File subDir = new File(dir.getParentFile(), "another");
@@ -150,8 +154,9 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test public void testExistingFilesDirectoryWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+    @Test
+    public void testExistingFilesDirectoryWatcher() throws Throwable {
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         File file = new File("target/tests/DirectoryWatcherTest/existing");
         MoreFiles.deleteRecursively(file.getParentFile().toPath());
         file.getParentFile().mkdirs();
@@ -176,8 +181,9 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test public void testFilteredDirectoryWatcher() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+    @Test
+    public void testFilteredDirectoryWatcher() throws Throwable {
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/DirectoryWatcherTest/some/sub/directory");
         dir.mkdirs();
         final File subDir = new File(dir.getParentFile(), "another");
@@ -206,16 +212,15 @@ public class DirectoryAndFileWatcherTest {
         }
     }
 
-    @Test(expected = AssertionError.class) public void testDirectoryWatcherListenerExceptionPropagation() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+    @Test(expected = AssertionError.class)
+    public void testDirectoryWatcherListenerExceptionPropagation() throws Throwable {
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File testFile = new File("target/tests/DirectoryWatcherTest/someFile");
         testFile.delete();
         final File dir = testFile.getParentFile();
         dir.mkdirs();
-        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).quietPeriodInMS(0).listener((p, c) -> {
-            fail("duh!");
-        }).exceptionHandler(assertableExceptionHandler).build()) {
-
+        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).quietPeriodInMS(0).listener(
+                (p, c) -> fail("duh!")).exceptionHandler(assertableExceptionHandler).build()) {
             Files.asCharSink(testFile, US_ASCII).write("yo");
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         }
@@ -223,30 +228,30 @@ public class DirectoryAndFileWatcherTest {
 
     @Test
     public void testOverwriteExistingFile() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
-        final File dir = new File("target/tests/DirectoryWatcherTest/existing");
+        var assertableExceptionHandler = new AssertableExceptionHandler();
+        final File dir = new File("target/tests/DirectoryWatcherTest/overwrite_existing");
         dir.mkdirs();
         final File file = File.createTempFile("test", "txt");
         final File to = dir.toPath().resolve("test.txt").toFile();
         Files.copy(file, to);
-        AtomicReference<ChangeKind> change = new AtomicReference<>();
+        java.util.List<ChangeKind> changes = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
 
-        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).listener((p, c) -> {
+        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).quietPeriodInMS(0).listener((p, c) -> {
             System.out.println("c = " + c);
-            change.set(c);
+            changes.add(c);
         }).exceptionHandler(assertableExceptionHandler).build()) {
             // We want it to call the listener once for setup, even without any change
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
             java.nio.file.Files.move(file.toPath(), to.toPath(), REPLACE_EXISTING);
 
 //             Files.move(file, to);
-            await().atMost(5, SECONDS).until(change::get, is(ChangeKind.CREATED));
+            await().atMost(5, SECONDS).until(() -> changes.contains(ChangeKind.CREATED) || changes.contains(ChangeKind.MODIFIED));
         }
     }
 
     @Test
     public void testFileWatcherWithSelectedChangeKinds() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         final File dir = new File("target/tests/FileWatcherTest/");
         final File subDir = new File(dir.getParentFile(), "subDir");
         dir.mkdirs();

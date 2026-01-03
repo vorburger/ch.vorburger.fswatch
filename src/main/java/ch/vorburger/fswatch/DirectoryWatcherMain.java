@@ -26,12 +26,18 @@ import java.io.IOException;
 /**
  * main() for DirectoryWatcher.
  *
- * See also src/test/java/ch/vorburger/fswatch/test/ExampleMain.java.
+ * <p>See also src/test/java/ch/vorburger/fswatch/test/ExampleMain.java.
  *
  * @author Michael Vorburger.ch
  */
 public class DirectoryWatcherMain {
 
+    /**
+     * Main method.
+     * @param args command line arguments
+     * @throws IOException if an I/O error occurs
+     * @throws InterruptedException if the thread is interrupted
+     */
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length < 1) {
             System.err.println("USAGE: <root-directory-to-watch-for-changes>");
@@ -45,7 +51,7 @@ public class DirectoryWatcherMain {
                 .path(dir)
                 .eventKinds(ChangeKind.CREATED, ChangeKind.MODIFIED, ChangeKind.DELETED)
                 // Using explicit anonymous inner classes instead of Lambdas for clarity to readers
-                .listener((path, changeKind) -> System.out.println(changeKind.toString() + " " + path.toString()))
+                .listener((path, changeKind) -> System.out.println(changeKind + " " + path))
                 .exceptionHandler(Throwable::printStackTrace).build();
 
         // This is just because it's a main(), you normally would NOT do this:

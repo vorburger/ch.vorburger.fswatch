@@ -19,23 +19,27 @@
  */
 package ch.vorburger.fswatch.test;
 
+import static ch.vorburger.fswatch.DirectoryWatcher.ChangeKind.MODIFIED;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 
+import ch.vorburger.fswatch.DirectoryWatcher;
 import ch.vorburger.fswatch.DirectoryWatcher.Listener;
 import ch.vorburger.fswatch.QuietPeriodListener;
 import org.junit.Test;
 
+import java.nio.file.Path;
+
 public class QuietPeriodListenerTest {
 
-    AssertableExceptionHandler assertableExceptionHandler;
     volatile boolean notified;
 
     @Test
     public void testQuietPeriodListener() throws Throwable {
-        assertableExceptionHandler = new AssertableExceptionHandler();
+        Path cwd = Path.of(".");
+        var assertableExceptionHandler = new AssertableExceptionHandler();
         Listener originalListener = (path, changeKind) -> {
             assertFalse(notified); // We want this to only be called once
             notified = true;
@@ -44,20 +48,20 @@ public class QuietPeriodListenerTest {
         Listener quietListener = new QuietPeriodListener(100, originalListener, assertableExceptionHandler);
 
         notified = false;
-        quietListener.onChange(null, null);
+        quietListener.onChange(cwd, MODIFIED);
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         await().atMost(1, SECONDS).until(() -> notified, is(true));
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
         notified = false;
-        quietListener.onChange(null, null);
-        quietListener.onChange(null, null);
+        quietListener.onChange(cwd, MODIFIED);
+        quietListener.onChange(cwd, MODIFIED);
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         await().atMost(1, SECONDS).until(() -> notified, is(true));
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
 
         notified = false;
-        quietListener.onChange(null, null);
+        quietListener.onChange(cwd, MODIFIED);
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         await().atMost(1, SECONDS).until(() -> notified, is(true));
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
@@ -65,7 +69,7 @@ public class QuietPeriodListenerTest {
         Thread.sleep(500);
 
         notified = false;
-        quietListener.onChange(null, null);
+        quietListener.onChange(cwd, MODIFIED);
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
         await().atMost(1, SECONDS).until(() -> notified, is(true));
         assertableExceptionHandler.assertNoErrorInTheBackgroundThread();

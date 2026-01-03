@@ -28,7 +28,7 @@ import java.io.IOException;
 /**
  * Example illustrating fswatch usage.
  *
- * See also src/main/java/ch/vorburger/fswatch/DirectoryWatcherMain.java
+ * <p>See also src/main/java/ch/vorburger/fswatch/DirectoryWatcherMain.java
  *
  * @author Michael Vorburger.ch
  */
@@ -37,7 +37,7 @@ public class ExampleMain {
     private static void watchDirectoryExample() throws IOException {
         File dir = new File(".");
         DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).existingFiles(false)
-                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build();
+                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path)).build();
 
         System.out.println("Press Enter to stop; now watching for changed in directory: " + dir.getAbsolutePath());
         System.in.read();
@@ -48,7 +48,7 @@ public class ExampleMain {
     private static void watchFileExample() throws IOException {
         File file = new File("pom.xml");
         DirectoryWatcher dw = new FileWatcherBuilder().path(file).existingFiles(true)
-                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path.toString())).build();
+                .listener((path, changeKind) -> System.out.println(changeKind.name() + " " + path)).build();
 
         System.out.println("Press Enter to stop; now watching for changed in file: " + file.getAbsolutePath());
         System.in.read();
