@@ -23,6 +23,7 @@ import static com.google.common.base.Charsets.US_ASCII;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -234,18 +235,18 @@ public class DirectoryAndFileWatcherTest {
         final File file = File.createTempFile("test", "txt");
         final File to = dir.toPath().resolve("test.txt").toFile();
         Files.copy(file, to);
-        java.util.List<ChangeKind> changes = java.util.Collections.synchronizedList(new java.util.ArrayList<>());
+        AtomicReference<ChangeKind> change = new AtomicReference<>();
 
-        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).quietPeriodInMS(0).listener((p, c) -> {
+        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).listener((p, c) -> {
             System.out.println("c = " + c);
-            changes.add(c);
+            change.set(c);
         }).exceptionHandler(assertableExceptionHandler).build()) {
             // We want it to call the listener once for setup, even without any change
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
             java.nio.file.Files.move(file.toPath(), to.toPath(), REPLACE_EXISTING);
 
 //             Files.move(file, to);
-            await().atMost(5, SECONDS).until(() -> changes.contains(ChangeKind.CREATED) || changes.contains(ChangeKind.MODIFIED));
+            await().atMost(5, SECONDS).until(change::get, anyOf(is(ChangeKind.CREATED), is(ChangeKind.MODIFIED)));
         }
     }
 
