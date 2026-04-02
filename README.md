@@ -26,3 +26,5 @@ and factored out of it in 2018 for re-use in project https://github.com/vorburge
 * https://github.com/azemm/FsWatcher
 * https://github.com/encima/FSWatcher7
 * https://www.teamdev.com/jxfilewatcher: Commercial, are they serious?!
+
+Last but not least, https://github.com/vorburger/ch.vorburger.exec is another handy small library from the same author.
