@@ -40,6 +40,9 @@ public class QuietPeriodListener implements Listener {
     protected @Nullable Thread thread;
     protected volatile boolean sleepAgain;
 
+    protected volatile Path lastPath;
+    protected volatile ChangeKind lastChangeKind;
+
     /**
      * Constructor.
      * @param quietPeriodInMS the quiet period in milliseconds
@@ -54,6 +57,8 @@ public class QuietPeriodListener implements Listener {
 
     @Override
     public synchronized void onChange(Path path, ChangeKind changeKind) {
+        this.lastPath = path;
+        this.lastChangeKind = changeKind;
         if (thread != null && thread.isAlive()) {
             sleepAgain = true;
             //System.out.println("sleepAgain = true");
@@ -65,7 +70,7 @@ public class QuietPeriodListener implements Listener {
                         //System.out.println("sleepAgain = false");
                         Thread.sleep(quietPeriodInMS);
                     } while (sleepAgain);
-                    delegate.onChange(path, changeKind);
+                    delegate.onChange(lastPath, lastChangeKind);
                 } catch (Throwable e) {
                     exceptionHandler.onException(e);
                 }

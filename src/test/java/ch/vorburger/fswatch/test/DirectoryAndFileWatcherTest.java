@@ -20,8 +20,10 @@
 package ch.vorburger.fswatch.test;
 
 import static com.google.common.base.Charsets.US_ASCII;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +37,7 @@ import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import java.io.File;
 import java.nio.file.FileSystems;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.BeforeClass;
@@ -221,6 +224,29 @@ public class DirectoryAndFileWatcherTest {
                 (p, c) -> fail("duh!")).exceptionHandler(assertableExceptionHandler).build()) {
             Files.asCharSink(testFile, US_ASCII).write("yo");
             assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+        }
+    }
+
+    @Test
+    public void testOverwriteExistingFile() throws Throwable {
+        var assertableExceptionHandler = new AssertableExceptionHandler();
+        final File dir = new File("target/tests/DirectoryWatcherTest/overwrite_existing");
+        dir.mkdirs();
+        final File file = File.createTempFile("test", "txt");
+        final File to = dir.toPath().resolve("test.txt").toFile();
+        Files.copy(file, to);
+        AtomicReference<ChangeKind> change = new AtomicReference<>();
+
+        try (DirectoryWatcher dw = new DirectoryWatcherBuilder().path(dir).listener((p, c) -> {
+            System.out.println("c = " + c);
+            change.set(c);
+        }).exceptionHandler(assertableExceptionHandler).build()) {
+            // We want it to call the listener once for setup, even without any change
+            assertableExceptionHandler.assertNoErrorInTheBackgroundThread();
+            java.nio.file.Files.move(file.toPath(), to.toPath(), REPLACE_EXISTING);
+
+//             Files.move(file, to);
+            await().atMost(5, SECONDS).until(change::get, anyOf(is(ChangeKind.CREATED), is(ChangeKind.MODIFIED)));
         }
     }
 
